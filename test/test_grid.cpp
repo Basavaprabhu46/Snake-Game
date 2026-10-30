@@ -1,10 +1,14 @@
 #include "Types.h"
-#include <gtest/gtest.h>
+#include <cassert>
+#include <iostream>
 
-TEST(GridInitializationTest, DefaultsToTwentyByTwenty)
+int main()
 {
     snake::RenderData data{};
 
-    EXPECT_EQ(data.gridCols, 20);
-    EXPECT_EQ(data.gridRows, 20);
+    assert(data.gridCols == 20);
+    assert(data.gridRows == 20);
+
+    std::cout << "UT-04 passed: Grid is 20x20\n";
+    return 0;
 }
