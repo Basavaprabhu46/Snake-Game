@@ -1,0 +1,32 @@
+# Build output
+build/
+cmake-build-*/
+out/
+
+# Object / binaries
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.exe
+SnakeGame
+
+# Coverage
+coverage/
+coverage.info
+*.gcov
+*.gcda
+*.gcno
+
+# Runtime data
+scores.dat
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Local video captures (large); keep docs/videos/.gitkeep
+docs/videos/*.mp4
