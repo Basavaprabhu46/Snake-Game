@@ -20,6 +20,7 @@
 
 #include "InputHandler.h"
 #include "Renderer.h"
+#include "ScoreManager.h"
 #include "Types.h"
 #include "screens/GameOverScreen.h"
 #include "screens/HighScoreScreen.h"
@@ -82,6 +83,10 @@ public:
           rng_(std::random_device{}()) {
         window_.setFramerateLimit(60);
         renderer_.loadFont();  // non-fatal if missing
+        scoreManager_.loadFromFile(); // Missing/corrupt file starts with an empty board.
+        leaderboard_ = scoreManager_.getTopScores();
+        data_.leaderboard = leaderboard_;
+        data_.highScore = leaderboard_.empty() ? 0 : leaderboard_.front().score;
         state_ = GameState::MainMenu;
     }
 
@@ -228,19 +233,12 @@ private:
     }
 
     void finishScoreEntry() {
-        ScoreEntry entry;
-        entry.initials = scoreEntry_.initials();
-        entry.score = data_.score;
-        leaderboard_.push_back(entry);
-        std::sort(leaderboard_.begin(), leaderboard_.end(),
-                  [](const ScoreEntry& a, const ScoreEntry& b) {
-                      return a.score > b.score;
-                  });
-        if (leaderboard_.size() > 5) {
-            leaderboard_.resize(5);
-        }
+        scoreManager_.addScore(scoreEntry_.initials(), data_.score);
+        // Keep the in-memory leaderboard usable even if disk writing fails.
+        leaderboard_ = scoreManager_.getTopScores();
+        scoreManager_.saveToFile();
         data_.leaderboard = leaderboard_;
-        data_.highScore = leaderboard_.front().score;
+        data_.highScore = leaderboard_.empty() ? 0 : leaderboard_.front().score;
         state_ = GameState::GameOver;
         gameOver_.reset();
     }
@@ -254,6 +252,7 @@ private:
         data_.level = 1;
         data_.score = 0;
         data_.highScore = leaderboard_.empty() ? 0 : leaderboard_.front().score;
+        data_.leaderboard = leaderboard_;
         data_.snake = {{10, 10}, {9, 10}, {8, 10}};
         data_.obstacles.clear();
 
@@ -269,15 +268,12 @@ private:
     }
 
     void update(float dt) {
+        // Freeze gameplay timers while paused so resume preserves the exact state.
+        if (state_ != GameState::Playing) return;
+
         if (levelUpRemaining_ > 0.f) {
             levelUpRemaining_ -= dt;
-            if (levelUpRemaining_ <= 0.f) {
-                data_.showLevelUp = false;
-            }
-        }
-
-        if (state_ != GameState::Playing) {
-            return;
+            if (levelUpRemaining_ <= 0.f) data_.showLevelUp = false;
         }
 
         accumulatorMs_ += dt * 1000.f;
@@ -368,14 +364,10 @@ private:
     }
 
     void triggerGameOver() {
-        if (data_.score > data_.highScore) {
-            data_.highScore = data_.score;
-        }
-        const bool qualifies =
-            data_.score > 0 &&
-            (leaderboard_.size() < 5 ||
-             data_.score > leaderboard_.back().score);
-        if (qualifies) {
+        if (data_.score > data_.highScore) data_.highScore = data_.score;
+
+        // FR-48: check qualification before displaying Game Over.
+        if (scoreManager_.isTopScore(data_.score)) {
             scoreEntry_.reset();
             state_ = GameState::ScoreEntry;
         } else {
@@ -462,6 +454,7 @@ private:
     GameState state_ = GameState::MainMenu;
     RenderData data_;
     std::vector<ScoreEntry> leaderboard_;
+    ScoreManager scoreManager_;
 
     Command direction_ = Command::Right;
     Command pendingDirection_ = Command::Right;
