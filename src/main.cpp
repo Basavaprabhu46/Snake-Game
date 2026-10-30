@@ -85,16 +85,27 @@ public:
         state_ = GameState::MainMenu;
     }
 
-    void run() {
-        sf::Clock frameClock;
-        while (window_.isOpen()) {
-            const float dt = frameClock.restart().asSeconds();
-            processEvents();
-            update(dt);
-            render();
-        }
-    }
+  void run() {
+    sf::Clock frameClock;
 
+    while (window_.isOpen()) {
+        const float dt = frameClock.restart().asSeconds();
+
+        processEvents();
+
+        if (!window_.isOpen()) {
+            break;
+        }
+
+        update(dt);
+
+        if (!window_.isOpen()) {
+            break;
+        }
+
+        render();
+    }
+}
 private:
     // --- Event / command handling -----------------------------------------
     void processEvents() {
