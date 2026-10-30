@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "HudText.h"
 
 #include <array>
 #include <string>
@@ -176,8 +177,8 @@ void Renderer::drawHUD(const RenderData& data) {
              kText);
     drawText("LEVEL " + std::to_string(data.level), 13,
              static_cast<float>(windowWidth()) / 2.f, top, kAccent, true);
-    drawText("HIGH " + std::to_string(data.highScore), 13,
-             static_cast<float>(windowWidth()) - MARGIN, top, kText, true);
+  drawText(highScoreLabel(data), 13,
+         static_cast<float>(windowWidth()) - MARGIN, top, kText, true);
 }
 
 void Renderer::drawGame(const RenderData& data) {

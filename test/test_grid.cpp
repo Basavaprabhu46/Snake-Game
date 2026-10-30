@@ -1,6 +1,7 @@
 #include "Types.h"
 #include <cassert>
 #include <iostream>
+#include "HudText.h"
 
 int main()
 {
@@ -17,6 +18,13 @@ int main()
     assert(gameData.level == 1);
 
     std::cout << "UT-06 passed: Score is 0 and level is 1\n";
+    // UT-18: HUD high-score display
+snake::RenderData hudData{};
+hudData.highScore = 500;
+
+assert(snake::highScoreLabel(hudData) == "HIGH 500");
+
+std::cout << "UT-18 passed: High score displayed correctly\n";
 
     return 0;
 }
