@@ -34,6 +34,7 @@ set(SNAKE_SOURCES
     src/main.cpp
     src/InputHandler.cpp
     src/Renderer.cpp
+    src/ScoreManager.cpp
     src/screens/MenuScreen.cpp
     src/screens/GameOverScreen.cpp
     src/screens/HighScoreScreen.cpp
