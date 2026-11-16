@@ -8,8 +8,8 @@
 
 | Result | Count |
 |---|---:|
-| Passed with captured execution evidence | 1 |
-| Ready for manual execution during team review | 8 |
+| Passed with captured execution evidence | 3 |
+| Ready for manual execution during team review | 6 |
 | Failed | 0 |
 
 ## Test cases
@@ -28,7 +28,7 @@
 
 ## Execution note
 
-ST-01 was executed and captured in this environment. The remaining cases require
+ST-01, ST-03 and ST-07 were verified from captured execution evidence. The remaining cases require
 interactive keyboard input in the SFML window. macOS blocked scripted keystrokes
 without Accessibility permission, so these are intentionally left as manual
 review cases rather than being falsely marked as passed.
